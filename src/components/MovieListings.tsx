@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { movies, genres } from "@/data/movies";
+import { useMovies } from "@/hooks/useMovies";
 import MovieCard from "./MovieCard";
+import { genres } from "@/data/movies";
 
 const MovieListings = () => {
   const [activeGenre, setActiveGenre] = useState("All");
+  const { data: movies = [], isLoading } = useMovies();
 
   const filtered =
     activeGenre === "All"
@@ -13,7 +15,6 @@ const MovieListings = () => {
 
   return (
     <section className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-16">
-      {/* Section header */}
       <div className="flex items-end justify-between mb-6">
         <div>
           <h2 className="text-3xl sm:text-4xl font-display text-foreground">
@@ -28,7 +29,6 @@ const MovieListings = () => {
         </a>
       </div>
 
-      {/* Genre filter */}
       <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide mb-6">
         {genres.map((genre) => (
           <button
@@ -45,26 +45,37 @@ const MovieListings = () => {
         ))}
       </div>
 
-      {/* Grid */}
-      <motion.div
-        layout
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6"
-      >
-        {filtered.map((movie) => (
-          <motion.div
-            key={movie.id}
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
-          >
-            <MovieCard movie={movie} />
-          </motion.div>
-        ))}
-      </motion.div>
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="rounded-xl bg-secondary aspect-[2/3] mb-3" />
+              <div className="h-4 bg-secondary rounded w-3/4 mb-2" />
+              <div className="h-3 bg-secondary rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          layout
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6"
+        >
+          {filtered.map((movie) => (
+            <motion.div
+              key={movie.id}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MovieCard movie={movie} />
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
 
-      {filtered.length === 0 && (
+      {!isLoading && filtered.length === 0 && (
         <p className="text-center text-muted-foreground py-16">
           No movies found in this genre.
         </p>
