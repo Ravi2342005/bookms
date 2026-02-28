@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minus, Plus, Loader2, CreditCard } from "lucide-react";
+import { X, Minus, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCreateBooking } from "@/hooks/useBookings";
 import { useNavigate } from "react-router-dom";
 import type { DBMovie } from "@/hooks/useMovies";
 import SeatLayout from "./SeatLayout";
+import PaymentDetails from "./PaymentDetails";
 
 const PRICE_PER_SEAT = 250;
 
@@ -19,7 +20,7 @@ interface BookingDialogProps {
 
 const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingDialogProps) => {
   const [seats, setSeats] = useState(1);
-  const [step, setStep] = useState<"select" | "seats" | "paying" | "done">("select");
+  const [step, setStep] = useState<"select" | "seats" | "payment">("select");
   const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -27,22 +28,12 @@ const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingD
 
   const maxSeats = Math.min(movie.available_seats ?? 0, 10);
 
-  const handleBook = async () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    setStep("paying");
-    try {
-      await createBooking.mutateAsync({
-        movieId: movie.id,
-        seats,
-        pricePerSeat: PRICE_PER_SEAT,
-      });
-      setStep("done");
-    } catch {
-      setStep("select");
-    }
+  const handlePay = async () => {
+    await createBooking.mutateAsync({
+      movieId: movie.id,
+      seats,
+      pricePerSeat: PRICE_PER_SEAT,
+    });
   };
 
   if (!open) return null;
@@ -61,22 +52,26 @@ const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingD
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="glass rounded-xl w-full max-w-lg p-6 relative"
+          className={`glass rounded-xl w-full ${step === "payment" ? "max-w-md" : "max-w-lg"} p-6 relative max-h-[90vh] overflow-y-auto`}
         >
-          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground z-10">
             <X className="h-5 w-5" />
           </button>
 
-          <h2 className="text-2xl font-display text-foreground mb-1">{movie.title}</h2>
-          <p className="text-sm text-muted-foreground mb-1">
-            {movie.genre.join(" · ")} · {movie.duration} · {movie.language}
-          </p>
-          {theaterName && showtime && (
-            <p className="text-sm text-primary font-medium mb-6">
-              {theaterName} — {showtime}
-            </p>
+          {step !== "payment" && (
+            <>
+              <h2 className="text-2xl font-display text-foreground mb-1">{movie.title}</h2>
+              <p className="text-sm text-muted-foreground mb-1">
+                {movie.genre.join(" · ")} · {movie.duration} · {movie.language}
+              </p>
+              {theaterName && showtime && (
+                <p className="text-sm text-primary font-medium mb-6">
+                  {theaterName} — {showtime}
+                </p>
+              )}
+              {!(theaterName && showtime) && <div className="mb-6" />}
+            </>
           )}
-          {!(theaterName && showtime) && <div className="mb-6" />}
 
           {step === "select" && (
             <div className="space-y-6">
@@ -139,33 +134,23 @@ const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingD
                 selectedCount={seats}
                 onConfirm={(seatIds) => {
                   setSelectedSeatIds(seatIds);
-                  handleBook();
+                  setStep("payment");
                 }}
               />
             </div>
           )}
 
-          {step === "paying" && (
-            <div className="flex flex-col items-center py-8 gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Processing payment...</p>
-            </div>
-          )}
-
-          {step === "done" && (
-            <div className="flex flex-col items-center py-8 gap-4">
-              <div className="text-4xl">🎉</div>
-              <p className="text-foreground font-semibold">Booking Confirmed!</p>
-              <p className="text-sm text-muted-foreground text-center">
-                {seats} ticket(s) for {movie.title}. Check your email for confirmation.
-              </p>
-              <button
-                onClick={onClose}
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground"
-              >
-                Done
-              </button>
-            </div>
+          {step === "payment" && (
+            <PaymentDetails
+              movieTitle={movie.title}
+              theaterName={theaterName ?? ""}
+              showtime={showtime ?? ""}
+              seatIds={selectedSeatIds}
+              seatCount={seats}
+              onPay={handlePay}
+              onBack={() => setStep("seats")}
+              onDone={onClose}
+            />
           )}
         </motion.div>
       </motion.div>
