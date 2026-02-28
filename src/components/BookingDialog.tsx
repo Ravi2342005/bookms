@@ -12,9 +12,11 @@ interface BookingDialogProps {
   movie: DBMovie;
   open: boolean;
   onClose: () => void;
+  theaterName?: string;
+  showtime?: string;
 }
 
-const BookingDialog = ({ movie, open, onClose }: BookingDialogProps) => {
+const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingDialogProps) => {
   const [seats, setSeats] = useState(1);
   const [step, setStep] = useState<"select" | "paying" | "done">("select");
   const { user } = useAuth();
@@ -64,9 +66,15 @@ const BookingDialog = ({ movie, open, onClose }: BookingDialogProps) => {
           </button>
 
           <h2 className="text-2xl font-display text-foreground mb-1">{movie.title}</h2>
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-sm text-muted-foreground mb-1">
             {movie.genre.join(" · ")} · {movie.duration} · {movie.language}
           </p>
+          {theaterName && showtime && (
+            <p className="text-sm text-primary font-medium mb-6">
+              {theaterName} — {showtime}
+            </p>
+          )}
+          {!(theaterName && showtime) && <div className="mb-6" />}
 
           {step === "select" && (
             <div className="space-y-6">
