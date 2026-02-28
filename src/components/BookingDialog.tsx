@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCreateBooking } from "@/hooks/useBookings";
 import { useNavigate } from "react-router-dom";
 import type { DBMovie } from "@/hooks/useMovies";
+import SeatLayout from "./SeatLayout";
 
 const PRICE_PER_SEAT = 250;
 
@@ -18,7 +19,8 @@ interface BookingDialogProps {
 
 const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingDialogProps) => {
   const [seats, setSeats] = useState(1);
-  const [step, setStep] = useState<"select" | "paying" | "done">("select");
+  const [step, setStep] = useState<"select" | "seats" | "paying" | "done">("select");
+  const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
   const { user } = useAuth();
   const navigate = useNavigate();
   const createBooking = useCreateBooking();
@@ -59,7 +61,7 @@ const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingD
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="glass rounded-xl w-full max-w-md p-6 relative"
+          className="glass rounded-xl w-full max-w-lg p-6 relative"
         >
           <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
@@ -108,13 +110,38 @@ const BookingDialog = ({ movie, open, onClose, theaterName, showtime }: BookingD
               </div>
 
               <button
-                onClick={handleBook}
+                onClick={() => {
+                  if (!user) {
+                    navigate("/auth");
+                    return;
+                  }
+                  setStep("seats");
+                }}
                 disabled={maxSeats === 0}
                 className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <CreditCard className="h-4 w-4" />
-                {user ? "Pay & Book" : "Sign In to Book"}
+                {user ? "Select Seats" : "Sign In to Book"}
               </button>
+            </div>
+          )}
+
+          {step === "seats" && (
+            <div>
+              <button
+                onClick={() => setStep("select")}
+                className="text-xs text-muted-foreground hover:text-foreground mb-3"
+              >
+                ← Back
+              </button>
+              <SeatLayout
+                maxSeats={maxSeats}
+                totalSeats={movie.available_seats ?? 60}
+                selectedCount={seats}
+                onConfirm={(seatIds) => {
+                  setSelectedSeatIds(seatIds);
+                  handleBook();
+                }}
+              />
             </div>
           )}
 
