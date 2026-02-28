@@ -2,7 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import type { DBMovie } from "@/hooks/useMovies";
+import TheaterShowtimes from "./TheaterShowtimes";
 import BookingDialog from "./BookingDialog";
+import type { Theater } from "@/data/theaters";
 
 // Map poster_url to local assets for seeded movies
 import posterAction from "@/assets/poster-action.jpg";
@@ -22,8 +24,16 @@ const posterMap: Record<string, string> = {
 };
 
 const MovieCard = ({ movie }: { movie: DBMovie }) => {
+  const [theatersOpen, setTheatersOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [selectedInfo, setSelectedInfo] = useState<{ theater: Theater; showtime: string } | null>(null);
   const posterSrc = posterMap[movie.poster_url ?? ""] ?? movie.poster_url ?? "";
+
+  const handleSelectShowtime = (theater: Theater, showtime: string) => {
+    setSelectedInfo({ theater, showtime });
+    setTheatersOpen(false);
+    setBookingOpen(true);
+  };
 
   return (
     <>
@@ -41,10 +51,10 @@ const MovieCard = ({ movie }: { movie: DBMovie }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
             <button
-              onClick={() => setBookingOpen(true)}
+              onClick={() => setTheatersOpen(true)}
               className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Book Now
+              Book Tickets
             </button>
           </div>
           <div className="absolute top-3 right-3 flex items-center gap-1 rounded-md bg-background/80 px-2 py-1 text-xs font-semibold backdrop-blur-sm">
@@ -65,7 +75,23 @@ const MovieCard = ({ movie }: { movie: DBMovie }) => {
         </div>
       </motion.div>
 
-      <BookingDialog movie={movie} open={bookingOpen} onClose={() => setBookingOpen(false)} />
+      <TheaterShowtimes
+        movie={movie}
+        open={theatersOpen}
+        onClose={() => setTheatersOpen(false)}
+        onSelectShowtime={handleSelectShowtime}
+      />
+
+      <BookingDialog
+        movie={movie}
+        open={bookingOpen}
+        onClose={() => {
+          setBookingOpen(false);
+          setSelectedInfo(null);
+        }}
+        theaterName={selectedInfo?.theater.name}
+        showtime={selectedInfo?.showtime}
+      />
     </>
   );
 };
