@@ -32,7 +32,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-4">
             <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <MapPin className="h-4 w-4" />
-              Mumbai
+              Chennai
             </button>
             {user ? (
               <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ const Navbar = () => {
                 />
               </div>
               <button className="flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" /> Mumbai
+                <MapPin className="h-4 w-4" /> Chennai
               </button>
               {user ? (
                 <>
