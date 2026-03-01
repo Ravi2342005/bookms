@@ -1,73 +1,68 @@
-# Welcome to your Lovable project
+# 🎬 BookMS — Movie Booking Application
 
-## Project info
+An online movie ticket booking platform built with modern web technologies. Users can browse movies, select seats, and book tickets with a seamless experience.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Tech Stack
 
-## How can I edit this code?
+| Layer | Technology |
+|-------|-----------|
+| **Frontend Framework** | React 18 with TypeScript |
+| **Build Tool** | Vite 5 |
+| **Styling** | Tailwind CSS 3 + shadcn/ui component library |
+| **Animations** | Framer Motion |
+| **Routing** | React Router DOM v6 |
+| **State Management** | TanStack React Query v5 |
+| **Forms** | React Hook Form + Zod validation |
+| **Backend & Database** | Lovable Cloud (Supabase) — PostgreSQL with Row Level Security |
+| **Authentication** | Email/password auth via Lovable Cloud |
+| **Serverless Functions** | Deno-based Edge Functions |
+| **Realtime** | PostgreSQL realtime subscriptions for live seat updates |
+| **Icons** | Lucide React |
+| **Date Utilities** | date-fns |
+| **Charts** | Recharts |
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- 🎥 Browse movie listings with posters, ratings, and genres
+- 🪑 Interactive seat selection layout
+- 💳 Simulated payment flow with booking confirmation
+- 🔐 User authentication (sign up / sign in)
+- 📋 View personal booking history
+- 🌐 Realtime seat availability updates
+- 📱 Fully responsive design (mobile + desktop)
+- 🌙 Dark mode support
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Project Structure
 
-Changes made via Lovable will be committed automatically to this repo.
+```
+src/
+├── components/       # Reusable UI components (Navbar, MovieCard, SeatLayout, etc.)
+├── contexts/         # React context providers (AuthContext)
+├── data/             # Static data (movies, theaters)
+├── hooks/            # Custom hooks (useMovies, useBookings, useAuth)
+├── integrations/     # Lovable Cloud client & types
+├── pages/            # Route pages (Index, AuthPage, MyBookings)
+└── components/ui/    # shadcn/ui primitives
+supabase/
+├── functions/        # Edge functions (update-availability)
+└── config.toml       # Backend configuration
+```
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Getting Started
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Open [Lovable](https://lovable.dev) and click **Share → Publish**.
 
-**Use GitHub Codespaces**
+## Custom Domain
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Navigate to **Project → Settings → Domains** and click **Connect Domain**.
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Read more: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
